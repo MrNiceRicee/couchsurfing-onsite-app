@@ -169,16 +169,14 @@ async function addFriendsToUsers({
     for (let i = 0; i < foundUsers.length; i++) {
       const user = foundUsers.at(i)!;
 
-      const potentialFriends = new Map(
-        foundUsers
-          .filter((friend) => friend.id !== user.id)
-          .map((friend) => [friend.id, friend]),
+      const potentialFriends = foundUsers.filter(
+        (friend) => friend.id !== user.id,
       );
 
       for (let j = 0; j < numberOfFriends; j++) {
-        const friend = potentialFriends.get(
-          Math.floor(Math.random() * potentialFriends.size),
-        );
+        const friend = potentialFriends.at(
+          Math.floor(Math.random() * potentialFriends.length),
+        )!;
         if (!friend) {
           continue;
         }
@@ -201,9 +199,8 @@ async function addFriendsToUsers({
             friendName: user.name,
           })
           .onConflictDoNothing();
-        // drizzle linter thinks this is a drizzle object instead of a map
-        // eslint-disable-next-line drizzle/enforce-delete-with-where
-        potentialFriends.delete(friend.id);
+
+        potentialFriends.splice(potentialFriends.indexOf(friend), 1);
       }
     }
   });

@@ -30,7 +30,7 @@ export const usersRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.coerce.number(),
-        currentUserId: z.coerce.number().optional(),
+        currentUserId: z.coerce.number().optional().default(0),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -137,7 +137,7 @@ export const usersRouter = createTRPCRouter({
         "user"."biography" AS "biography",
         "user"."created_at" AS "createdAt",
         "user"."updated_at" AS "updatedAt",
-        "user_friends"."friends" AS "friends",
+        COALESCE("user_friends"."friends", '[]'::json) AS "friends",
         CASE
           WHEN "friendship"."friend_id" IS NOT NULL THEN 'friend'
           WHEN "mutual_count"."count" > 0 THEN 'mutual'
@@ -147,7 +147,7 @@ export const usersRouter = createTRPCRouter({
         "couchsurfing-onsite-app_users" "user"
         LEFT JOIN LATERAL (
           SELECT
-            ARRAY_AGG(
+            JSON_AGG(
               JSON_BUILD_OBJECT(
                 'id', "friend"."friend_id",
                 'name', "friend"."friend_name",
@@ -175,7 +175,7 @@ export const usersRouter = createTRPCRouter({
             FROM "couchsurfing-onsite-app_friends"
             WHERE "user_id" = ${input.currentUserId}
           )
-            AND "mutual"."user_id" != ${input.currentUserId}
+          ${sql`AND "mutual"."user_id" != ${input.currentUserId}`}
         ) "mutual_count" ON TRUE
         WHERE
           "user"."id" = ${input.id};
@@ -201,7 +201,6 @@ export const usersRouter = createTRPCRouter({
       }
 
       console.log(foundUserQuery);
-      console.log(foundUserQuery.friends, foundUserQuery.friends.length);
 
       return foundUserQuery;
     }),

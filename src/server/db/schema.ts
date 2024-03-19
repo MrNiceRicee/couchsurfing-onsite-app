@@ -61,25 +61,25 @@ export const friends = createTable(
   }),
 );
 
-export const userRelations = relations(users, ({ many }) => {
-  return {
-    friends: many(friends, {
-      relationName: "user-friends",
-    }),
-  };
-});
+// export const userRelations = relations(users, ({ many }) => {
+//   return {
+//     friends: many(friends, {
+//       relationName: "user-friends",
+//     }),
+//   };
+// });
 
-export const friendRelations = relations(friends, ({ one }) => {
-  return {
-    user: one(users, {
-      fields: [friends.userId],
-      references: [users.id],
-      relationName: "friends-table-is-user",
-    }),
-    friend: one(users, {
-      fields: [friends.friendId],
-      references: [users.id],
-      relationName: "friends-table-is-friend",
-    }),
-  };
-});
+// export const friendRelations = relations(friends, ({ one }) => {
+//   return {
+//     user: one(users, {
+//       fields: [friends.userId],
+//       references: [users.id],
+//       relationName: "friends-table-is-user",
+//     }),
+//     friend: one(users, {
+//       fields: [friends.friendId],
+//       references: [users.id],
+//       relationName: "friends-table-is-friend",
+//     }),
+//   };
+// });
