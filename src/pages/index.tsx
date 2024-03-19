@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { LoaderIcon, TrashIcon } from "lucide-react";
+import { LoaderIcon } from "lucide-react";
 import { userAtom } from "~/atoms/userAtom";
 import { SearchParamInput } from "~/components/SearchParamInput";
 import { Button } from "~/components/ui/button";
@@ -146,7 +146,7 @@ function SeedOrResetDatabase() {
   }
 
   return (
-    <section className="mt-8">
+    <section className="mt-8 flex flex-col items-center">
       <h2 className="text-2xl font-bold">Seed Database</h2>
       <div>
         <Button onClick={onClickSeed} disabled={seed.isPending}>

@@ -1,4 +1,4 @@
-import { eq, gt, ilike, sql } from "drizzle-orm";
+import { gt, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
