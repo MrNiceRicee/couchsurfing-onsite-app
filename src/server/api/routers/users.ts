@@ -24,6 +24,7 @@ export const usersRouter = createTRPCRouter({
     return ctx.db.transaction(async (tx) => {
       await tx.delete(friends).where(gt(friends.id, 0));
       await tx.delete(users).where(gt(users.id, 0));
+      return Promise.resolve();
     });
   }),
   one: publicProcedure
@@ -199,8 +200,6 @@ export const usersRouter = createTRPCRouter({
       if (!foundUserQuery) {
         return null;
       }
-
-      console.log(foundUserQuery);
 
       return foundUserQuery;
     }),

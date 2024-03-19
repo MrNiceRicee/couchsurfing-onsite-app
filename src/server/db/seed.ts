@@ -158,21 +158,25 @@ async function addFriendsToUsers({
 }: {
   numberOfFriends: number;
 }) {
-  return db.transaction(async (tx) => {
-    const foundUsers = await tx
-      .select({
-        id: dbUser.id,
-        name: dbUser.name,
-      })
-      .from(dbUser);
-
-    for (let i = 0; i < foundUsers.length; i++) {
-      const user = foundUsers.at(i)!;
-
+  const foundUsers = await db
+    .select({
+      id: dbUser.id,
+      name: dbUser.name,
+    })
+    .from(dbUser);
+  for (let i = 0; i < foundUsers.length; i++) {
+    const user = foundUsers.at(i)!;
+    await db.transaction(async (tx) => {
       const potentialFriends = foundUsers.filter(
         (friend) => friend.id !== user.id,
       );
 
+      const valuesToInsert: Array<{
+        userId: number;
+        userName: string;
+        friendId: number;
+        friendName: string;
+      }> = [];
       for (let j = 0; j < numberOfFriends; j++) {
         const friend = potentialFriends.at(
           Math.floor(Math.random() * potentialFriends.length),
@@ -181,34 +185,33 @@ async function addFriendsToUsers({
           continue;
         }
 
-        await tx
-          .insert(dbFriend)
-          .values({
-            userId: user.id,
-            userName: user.name,
-            friendId: friend.id,
-            friendName: friend.name,
-          })
-          .onConflictDoNothing();
-        await tx
-          .insert(dbFriend)
-          .values({
-            userId: friend.id,
-            userName: friend.name,
-            friendId: user.id,
-            friendName: user.name,
-          })
-          .onConflictDoNothing();
-
-        potentialFriends.splice(potentialFriends.indexOf(friend), 1);
+        valuesToInsert.push({
+          userId: user.id,
+          userName: user.name,
+          friendId: friend.id,
+          friendName: friend.name,
+        });
+        valuesToInsert.push({
+          userId: friend.id,
+          userName: friend.name,
+          friendId: user.id,
+          friendName: user.name,
+        });
       }
-    }
-  });
+      await tx.insert(dbFriend).values(valuesToInsert).onConflictDoNothing();
+    });
+  }
 }
 
 export async function seedDatabase() {
+  console.log("seeding database");
   await seedUsers(100);
+  console.log("added users");
+  console.log("adding friends");
   await addFriendsToUsers({ numberOfFriends: 10 });
+  console.log("added friends");
+  console.log("done seeding database");
+  return Promise.resolve();
 }
 
 export default seedDatabase;
