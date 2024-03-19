@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { HomeIcon } from "lucide-react";
+import { Github, HomeIcon } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -90,6 +90,25 @@ function NavBar() {
   );
 }
 
+function Footer() {
+  return (
+    <footer className="flex w-full items-center justify-center p-2 text-sm space-x-2 mt-auto">
+      <span>Made with ❤️ by Joshua Santos</span>
+      <Link
+        href="https://github.com/mrnicericee"
+        // no referrer policy
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span className="flex items-center gap-2 rounded-full px-2 text-sm outline outline-1 outline-border">
+          <Github className="h-4 w-4" />
+          <span className="text-sm">GitHub</span>
+        </span>
+      </Link>
+    </footer>
+  );
+}
+
 export function BaseLayout({ children, head }: BaseLayoutProps) {
   return (
     <>
@@ -103,6 +122,7 @@ export function BaseLayout({ children, head }: BaseLayoutProps) {
         <div className="flex h-full flex-col items-center justify-center p-2">
           {children}
         </div>
+        <Footer />
       </main>
     </>
   );

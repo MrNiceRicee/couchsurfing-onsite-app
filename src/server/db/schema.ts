@@ -69,17 +69,17 @@ export const userRelations = relations(users, ({ many }) => {
   };
 });
 
-export const friendRelations = relations(friends, ({ one, many }) => {
+export const friendRelations = relations(friends, ({ one }) => {
   return {
     user: one(users, {
       fields: [friends.userId],
       references: [users.id],
-      relationName: "friends-table-is-user"
+      relationName: "friends-table-is-user",
     }),
     friend: one(users, {
       fields: [friends.friendId],
       references: [users.id],
-      relationName: "friends-table-is-friend"
+      relationName: "friends-table-is-friend",
     }),
   };
 });
