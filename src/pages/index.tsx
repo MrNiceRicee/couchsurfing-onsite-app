@@ -20,13 +20,14 @@ import { api } from "~/utils/api";
     - 📝 decided not to use the new App Router from NextJs 13 due to time constraints
   ✅ The data for the users can be seeded from mock data, files, or any other mock. A database is not necessary.
     - 📝 seeded a database & also pulling data from database 
-  ❌ The user can click a user to go to a new page which shows that user's detailed profile.
+  ✅ The user can click a user to go to a new page which shows that user's detailed profile.
   ✅ The profile information should come from API endpoints that are served from the NextJS app.
     - 📝 Pulling data from tRPC as the api wrapper
 
   TODO (optional):
-  ❌ User should have an attribute that describes its relationship to other users (think friends)
-  ❌ The profile page shows a list of their friends. Each friend can be clicked on to take the user to that profile.
+  ✅ User should have an attribute that describes its relationship to other users (think friends)
+  ✅ The profile page shows a list of their friends. Each friend can be clicked on to take the user to that profile.
+    - 📝 just went with a super simple list of friends
 */
 
 function UsersList() {
@@ -43,7 +44,7 @@ function UsersList() {
 
   if (!users.data?.length) {
     return (
-      <div className="min-h-[50dvh] animate-in fade-in slide-in-from-top-4">
+      <div className="min-h-[54dvh] animate-in fade-in slide-in-from-top-4">
         {users.isLoading && <LoaderIcon className="h-6 w-6 animate-spin" />}
         <p>No users found</p>
       </div>
