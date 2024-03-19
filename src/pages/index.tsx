@@ -43,7 +43,7 @@ function UsersList() {
 
   if (!users.data?.length) {
     return (
-      <div className="min-h-[50dvh]">
+      <div className="min-h-[50dvh] animate-in fade-in slide-in-from-top-4">
         {users.isLoading && <LoaderIcon className="h-6 w-6 animate-spin" />}
         <p>No users found</p>
       </div>
@@ -54,7 +54,8 @@ function UsersList() {
     <>
       {users.isLoading && <LoaderIcon className="h-6 w-6 animate-spin" />}
       <ScrollArea
-        className="h-[50dvh]"
+        // tease that this is scrollable
+        className="h-[54dvh]"
         style={{
           WebkitMaskImage:
             "linear-gradient(to bottom, transparent, black 2%, black 98%, transparent)",
