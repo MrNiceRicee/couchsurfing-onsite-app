@@ -49,7 +49,7 @@ function UserDetails({ userId }: { userId: number }) {
     delay: 200,
   });
 
-  if (isLoading) {
+  if (isLoading || !user.isLoading) {
     return <LoaderIcon className="h-6 w-6 animate-spin" />;
   }
 
