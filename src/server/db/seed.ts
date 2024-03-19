@@ -122,17 +122,21 @@ function generateRandomBiography() {
   const likedActivity = activities.at(
     Math.floor(Math.random() * activities.length),
   )!;
-  const dislikedActivity =
-    activities[Math.floor(Math.random() * activities.length)]!;
+  const dislikedActivity = activities.at(
+    Math.floor(Math.random() * activities.length),
+  )!;
 
   if (likedActivity === dislikedActivity) {
     return `I have a weird relationship with ${likedActivity}.`;
   }
 
-  const levelOfLike =
-    likenessLevel[Math.floor(Math.random() * likenessLevel.length)]!;
-  const levelOfDislike =
-    disLikenessLevel[Math.floor(Math.random() * disLikenessLevel.length)]!;
+  const levelOfLike = likenessLevel.at(
+    Math.floor(Math.random() * likenessLevel.length),
+  )!;
+
+  const levelOfDislike = disLikenessLevel.at(
+    Math.floor(Math.random() * disLikenessLevel.length),
+  )!;
 
   return `I ${levelOfLike} ${likedActivity} and ${levelOfDislike} ${dislikedActivity}.`;
 }
