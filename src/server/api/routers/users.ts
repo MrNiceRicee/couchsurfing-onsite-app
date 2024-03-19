@@ -78,6 +78,45 @@ export const usersRouter = createTRPCRouter({
         };
       }
 
+      if (input.currentUserId && input.id !== input.currentUserId) {
+        const currentUserFriends = (await ctx.db.execute(
+          sql`
+            SELECT
+              "user"."name" AS "name",
+              "user"."biography" AS "biography",
+              "user"."created_at" AS "createdAt",
+              "user"."updated_at" AS "updatedAt",
+              "user"."id" AS "id"
+              
+            FROM "couchsurfing-onsite-app_friends" "friends"
+              LEFT JOIN "couchsurfing-onsite-app_users" "user"
+                 ON "friends"."friend_id" = "user"."id"
+            WHERE "friends"."user_id" = ${input.currentUserId}
+          `,
+        )) as Array<{
+          name: string;
+          biography: string;
+          createdAt: Date;
+          updatedAt: Date;
+          id: number;
+        }>;
+
+        const isMutual = currentUserFriends.some((mutuals) => {
+          if (mutuals.id === input.id) {
+            return true;
+          }
+          return foundUserFriends.some((friend) => friend.id === mutuals.id);
+        });
+
+        if (isMutual) {
+          return {
+            ...foundUser,
+            friends: foundUserFriends,
+            relationshipToCurrentUser: "mutual" as const,
+          };
+        }
+      }
+
       return {
         ...foundUser,
         friends: foundUserFriends,
