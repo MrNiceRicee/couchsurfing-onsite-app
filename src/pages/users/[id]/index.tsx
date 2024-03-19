@@ -96,7 +96,10 @@ function UserDetails({ userId }: { userId: number }) {
         </section>
       </div>
       <section className="flex w-full flex-col gap-2">
-        <h2 className="text-2xl font-bold">Friends</h2>
+        <h2 className="text-2xl font-bold">
+          Friends
+          <span> ({user.data.friends.length})</span>
+        </h2>
         <SearchParamInput pathName="search" debounceDelay={0} />
         <ScrollArea
           // tease that there are more users to scroll to (same as the main page)

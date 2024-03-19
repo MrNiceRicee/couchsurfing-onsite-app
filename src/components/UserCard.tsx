@@ -5,7 +5,7 @@ import { ImpersonateUser } from "./ImpersonateUser";
 interface User {
   id: number;
   name: string;
-  biography: string;
+  biography: string | null;
 }
 
 export function UserCard({ user }: { user: User }) {
