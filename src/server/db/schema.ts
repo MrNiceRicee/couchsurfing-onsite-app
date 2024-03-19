@@ -1,7 +1,7 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   index,
   pgTableCreator,
@@ -60,3 +60,26 @@ export const friends = createTable(
     ),
   }),
 );
+
+export const userRelations = relations(users, ({ many }) => {
+  return {
+    friends: many(friends, {
+      relationName: "user-friends",
+    }),
+  };
+});
+
+export const friendRelations = relations(friends, ({ one, many }) => {
+  return {
+    user: one(users, {
+      fields: [friends.userId],
+      references: [users.id],
+      relationName: "friends-table-is-user"
+    }),
+    friend: one(users, {
+      fields: [friends.friendId],
+      references: [users.id],
+      relationName: "friends-table-is-friend"
+    }),
+  };
+});
