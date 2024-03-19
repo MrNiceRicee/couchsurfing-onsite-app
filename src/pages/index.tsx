@@ -1,6 +1,9 @@
-import { LoaderIcon } from "lucide-react";
+import { useSetAtom } from "jotai";
+import { LoaderIcon, TrashIcon } from "lucide-react";
+import { userAtom } from "~/atoms/userAtom";
 import { SearchParamInput } from "~/components/SearchParamInput";
 import { Button } from "~/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { UserCard } from "~/components/UserCard";
 import { useSearchParams } from "~/hooks/useSearchParams";
@@ -82,14 +85,30 @@ function UsersList() {
   );
 }
 
-function SeedDatabase() {
+function SeedOrResetDatabase() {
+  const setImpersonateUser = useSetAtom(userAtom);
   const seed = api.users.seed.useMutation();
+  const reset = api.users.deleteAll.useMutation();
   const users = api.users.search.useQuery({ name: "" });
   const apiUtil = api.useUtils();
 
-  const onClick = async () => {
-    await seed.mutateAsync();
-    await apiUtil.invalidate();
+  const onClickSeed = async () => {
+    try {
+      await seed.mutateAsync();
+      await apiUtil.invalidate();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onClickReset = async () => {
+    try {
+      await reset.mutateAsync();
+      await apiUtil.invalidate();
+      setImpersonateUser(null);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   if (users.isLoading) {
@@ -97,14 +116,40 @@ function SeedDatabase() {
   }
 
   if (users.data?.length) {
-    return null;
+    return (
+      <section className="mt-8 flex flex-col items-center">
+        <h2 className="text-2xl font-bold">Start over?</h2>
+        <div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Reset Database</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <p>Are you sure you want to reset the database?</p>
+              <Button onClick={onClickReset} disabled={reset.isPending}>
+                {reset.isPending ? (
+                  <div className="flex w-full animate-pulse items-center justify-center">
+                    Resetting database...
+                    <LoaderIcon className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : (
+                  <div className="flex w-full items-center justify-center">
+                    Reset Database
+                  </div>
+                )}
+              </Button>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section className="mt-8">
       <h2 className="text-2xl font-bold">Seed Database</h2>
       <div>
-        <Button onClick={onClick} disabled={seed.isPending}>
+        <Button onClick={onClickSeed} disabled={seed.isPending}>
           {seed.isPending ? (
             <div className="flex w-full animate-pulse items-center justify-center">
               Seeding database...
@@ -138,7 +183,7 @@ export default function Home() {
         <SearchParamInput pathName="search" />
         <UsersList />
       </div>
-      <SeedDatabase />
+      <SeedOrResetDatabase />
     </BaseLayout>
   );
 }

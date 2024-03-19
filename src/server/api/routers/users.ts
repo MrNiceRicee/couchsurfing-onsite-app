@@ -1,8 +1,8 @@
-import { ilike, sql } from "drizzle-orm";
+import { eq, gt, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { users } from "~/server/db/schema";
+import { friends, users } from "~/server/db/schema";
 import seedDatabase from "~/server/db/seed";
 
 export const usersRouter = createTRPCRouter({
@@ -19,6 +19,12 @@ export const usersRouter = createTRPCRouter({
     }),
   seed: publicProcedure.mutation(async () => {
     return seedDatabase();
+  }),
+  deleteAll: publicProcedure.mutation(async ({ ctx }) => {
+    return ctx.db.transaction(async (tx) => {
+      await tx.delete(friends).where(gt(friends.id, 0));
+      await tx.delete(users).where(gt(users.id, 0));
+    });
   }),
   one: publicProcedure
     .input(
