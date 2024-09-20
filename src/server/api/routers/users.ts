@@ -133,51 +133,48 @@ export const usersRouter = createTRPCRouter({
       const [foundUserQuery] = (await ctx.db.execute(
         sql`
         SELECT
-        "user"."id" AS "id",
-        "user"."name" AS "name",
-        "user"."biography" AS "biography",
-        "user"."created_at" AS "createdAt",
-        "user"."updated_at" AS "updatedAt",
-        COALESCE("user_friends"."friends", '[]'::json) AS "friends",
-        CASE
-          WHEN "friendship"."friend_id" IS NOT NULL THEN 'friend'
-          WHEN "mutual_count"."count" > 0 THEN 'mutual'
-          ELSE 'none'
-        END AS "relationshipToCurrentUser"
-      FROM
-        "couchsurfing-onsite-app_users" "user"
-        LEFT JOIN LATERAL (
-          SELECT
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
-                'id', "friend"."friend_id",
-                'name', "friend"."friend_name",
-                'biography', "friend_user"."biography",
-                'createdAt', "friend"."created_at",
-                'updatedAt', "friend"."updated_at"
-              )
-            ) AS "friends"
-          FROM
-            "couchsurfing-onsite-app_friends" "friend"
-            JOIN "couchsurfing-onsite-app_users" "friend_user" ON "friend"."friend_id" = "friend_user"."id"
-          WHERE
-            "friend"."user_id" = "user"."id"
-        ) "user_friends" ON TRUE
-        
+          "user"."id" AS "id",
+          "user"."name" AS "name",
+          "user"."biography" AS "biography",
+          "user"."created_at" AS "createdAt",
+          "user"."updated_at" AS "updatedAt",
+          COALESCE("user_friends"."friends", '[]'::json) AS "friends",
+          CASE
+            WHEN "user"."id" = ${input.currentUserId} THEN 'current'
+            WHEN "friendship"."friend_id" IS NOT NULL THEN 'friend'
+            WHEN EXISTS (
+              SELECT 1
+              FROM "couchsurfing-onsite-app_friends" "mutual"
+                JOIN "couchsurfing-onsite-app_friends" "current_user_friends"
+                  ON "mutual"."friend_id" = "current_user_friends"."friend_id"
+              WHERE "current_user_friends"."user_id" = ${input.currentUserId}
+                AND "mutual"."user_id" = "user"."id"
+                AND "mutual"."user_id" != ${input.currentUserId}
+              LIMIT 1
+            ) THEN 'mutual'
+            ELSE 'none'
+          END AS "relationshipToCurrentUser"
+        FROM
+          "couchsurfing-onsite-app_users" "user"
+          LEFT JOIN LATERAL (
+            SELECT
+              JSON_AGG(
+                JSON_BUILD_OBJECT(
+                  'id', "friend"."friend_id",
+                  'name', "friend"."friend_name",
+                  'biography', "friend_user"."biography",
+                  'createdAt', "friend"."created_at",
+                  'updatedAt', "friend"."updated_at"
+                )
+              ) AS "friends"
+            FROM
+              "couchsurfing-onsite-app_friends" "friend"
+              JOIN "couchsurfing-onsite-app_users" "friend_user" ON "friend"."friend_id" = "friend_user"."id"
+            WHERE
+              "friend"."user_id" = "user"."id"
+          ) "user_friends" ON TRUE
         LEFT JOIN "couchsurfing-onsite-app_friends" "friendship"
           ON "friendship"."user_id" = ${input.currentUserId} AND "friendship"."friend_id" = "user"."id"
-        
-        LEFT JOIN LATERAL (
-          SELECT
-            COUNT(*) AS "count"
-          FROM "couchsurfing-onsite-app_friends" "mutual"
-          WHERE "mutual"."user_id" = "user"."id" AND "mutual"."friend_id" IN (
-            SELECT "friend_id"
-            FROM "couchsurfing-onsite-app_friends"
-            WHERE "user_id" = ${input.currentUserId}
-          )
-          ${sql`AND "mutual"."user_id" != ${input.currentUserId}`}
-        ) "mutual_count" ON TRUE
         WHERE
           "user"."id" = ${input.id};
         `,

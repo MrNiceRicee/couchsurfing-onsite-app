@@ -29,6 +29,7 @@ function InitialName({ name }: { name: string }) {
 }
 
 const relationshipToCurrentUserMap = {
+  'current': 'You',
   friend: "Friend",
   mutual: "Mutual",
   none: "No relationship",
@@ -67,7 +68,7 @@ function UserDetails({ userId }: { userId: number }) {
             </AvatarFallback>
           </Avatar>
           <div className="flex w-full justify-between">
-            <h1 className="text-xl">{user.data.name}</h1>
+            <h1 className="text-xl font-cal">{user.data.name}</h1>
             <ImpersonateUser
               user={{ name: user.data.name ?? "", id: user.data.id }}
             />
@@ -96,7 +97,7 @@ function UserDetails({ userId }: { userId: number }) {
         </section>
       </div>
       <section className="flex w-full flex-col gap-2">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl font-bold font-cal">
           Friends
           <span> ({user.data.friends.length})</span>
         </h2>

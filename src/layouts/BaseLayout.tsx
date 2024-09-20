@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { Github, HomeIcon } from "lucide-react";
+import { Github, HomeIcon, UserIcon } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -83,6 +83,12 @@ function NavBar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={onClick}>Remove</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/users/${impersonateUser?.id ?? 0}`} className="space-x-2">
+                <UserIcon className="h-4 w-4" />
+                <span className="text-sm">View profile</span>
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -92,7 +98,7 @@ function NavBar() {
 
 function Footer() {
   return (
-    <footer className="flex w-full items-center justify-center p-2 text-sm space-x-2 mt-auto">
+    <footer className="mt-auto flex w-full items-center justify-center space-x-2 p-2 text-sm">
       <span>Made with ❤️ by Joshua Santos</span>
       <Link
         href="https://github.com/mrnicericee"
